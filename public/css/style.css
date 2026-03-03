@@ -1,0 +1,30 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.card {
+  border-radius: 0.75rem;
+}
+
+.survey-step {
+  min-height: 220px;
+}
+
+.rating-options .form-check-label {
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.rating-options .form-check-input:checked + .form-check-label {
+  font-weight: 600;
+}
+
+#responses-list .response {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0.35rem 0;
+}
+
+#responses-list .response:last-child {
+  border-bottom: none;
+}
+
