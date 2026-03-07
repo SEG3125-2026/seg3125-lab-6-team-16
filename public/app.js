@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DATA_FILE = path.join(__dirname, 'data', 'responses.json');
+const DATA_FILE = path.join(__dirname, '..', 'data', 'responses.json');
 
 function readResponses() {
   try {
