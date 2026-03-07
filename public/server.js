@@ -5,24 +5,23 @@ const { setupApi } = require('./app');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json());
+// Project root (one level up from public/) – index.html & analyst.html live here so the link works
+const projectRoot = path.join(__dirname, '..');
+// Static assets (css, js) live in public/
+const publicDir = path.join(projectRoot, 'public');
 
-// Serve static files (survey + analyst views)
-const publicDir = path.join(__dirname, '..', 'public');
+app.use(express.json());
 app.use(express.static(publicDir));
 
-// API routes
 setupApi(app);
 
-// Default route -> survey
+// Serve index.html from project root (required for assignment link)
 app.get('/', (req, res) => {
-  res.sendFile(path.join(publicDir,'..', 'index.html'));
+  res.sendFile(path.join(projectRoot, 'index.html'));
 });
 
-// Analyst view route
 app.get('/analyst', (req, res) => {
-  res.sendFile(path.join(publicDir, '..', 'analyst.html'));
+  res.sendFile(path.join(projectRoot, 'analyst.html'));
 });
 
 app.listen(PORT, () => {
