@@ -1,5 +1,6 @@
 let currentStep = 1;
 const TOTAL_STEPS = 3;
+const STORAGE_KEY = 'lab6_responses';
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('next-step').addEventListener('click', handleNext);
@@ -37,7 +38,6 @@ function handlePrev() {
 
 function validateStep(step) {
   let valid = true;
-  const form = document.getElementById('survey-form');
 
   if (step === 1) {
     const nameInput = document.getElementById('name');
@@ -62,6 +62,12 @@ function validateStep(step) {
   return valid;
 }
 
+function saveToLocalStorage(entry) {
+  const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  existing.push(entry);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+}
+
 async function submitSurvey() {
   const nextBtn = document.getElementById('next-step');
   const spinner = document.getElementById('submit-spinner');
@@ -75,27 +81,30 @@ async function submitSurvey() {
   if (document.getElementById('svc-style').checked) services.push('Wash & Style');
 
   const payload = {
+    id: Date.now(),
+    submittedAt: new Date().toISOString(),
     name: document.getElementById('name').value.trim(),
     ageRange: document.getElementById('ageRange').value || null,
     answers: {
-      satisfaction: document.querySelector('input[name=\"satisfaction\"]:checked')?.value || null,
+      satisfaction: document.querySelector('input[name="satisfaction"]:checked')?.value || null,
       services,
       improvement: document.getElementById('improvement').value.trim() || null,
       recommend: document.getElementById('recommend').value || null
     }
   };
 
+  // Always save to localStorage (works everywhere, including GitHub Pages)
+  saveToLocalStorage(payload);
+
+  // Also try the Node API (works when running locally with node server.js)
   try {
     await axios.post('/api/responses', payload);
-    window.location.href = '/analyst';
-  } catch (err) {
-    console.error(err);
-    alert('There was an error submitting the survey. Please try again.');
-    nextBtn.disabled = false;
-    spinner.classList.add('d-none');
+  } catch (_) {
+    // Server not available (GitHub Pages) – fine, localStorage has it
   }
+
+  // Relative path so it works on both localhost and GitHub Pages
+  window.location.href = 'analyst.html';
 }
 
-// Initialise first step
 showStep(1);
-

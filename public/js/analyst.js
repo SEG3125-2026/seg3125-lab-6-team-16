@@ -1,15 +1,21 @@
+const STORAGE_KEY = 'lab6_responses';
+
 async function fetchResponses() {
+  let data = [];
+
+  // Try the Node API first (works on localhost with node server.js)
   try {
     const res = await axios.get('/api/responses');
-    const data = res.data || [];
-    renderOverview(data);
-    renderSatisfactionChart(data);
-    renderServicesChart(data);
-    renderRecentList(data);
-  } catch (err) {
-    console.error(err);
-    alert('Failed to load responses from server.');
+    data = res.data || [];
+  } catch (_) {
+    // Server not available (GitHub Pages) – read from localStorage instead
+    data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   }
+
+  renderOverview(data);
+  renderSatisfactionChart(data);
+  renderServicesChart(data);
+  renderRecentList(data);
 }
 
 async function resetResponses() {
@@ -17,13 +23,17 @@ async function resetResponses() {
     return;
   }
 
+  // Clear localStorage
+  localStorage.removeItem(STORAGE_KEY);
+
+  // Also try clearing on the server
   try {
     await axios.post('/api/responses/reset');
-    await fetchResponses();
-  } catch (err) {
-    console.error(err);
-    alert('Failed to reset responses on the server.');
+  } catch (_) {
+    // Server not available – fine, localStorage already cleared
   }
+
+  window.location.reload();
 }
 
 function renderOverview(responses) {
@@ -139,4 +149,3 @@ document.addEventListener('DOMContentLoaded', () => {
     resetBtn.addEventListener('click', resetResponses);
   }
 });
-
